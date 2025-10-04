@@ -47,9 +47,9 @@ def rectangular_solver(A,b,tol=1e-12):
     y_piv = y[:r]
 
     # Particular and null in z-coordinates
-    zB_part = forward_substitution(U11, y_piv)
+    zB_part = back_substitution(U11, y_piv)
     if n > r:
-        NB = -forward_substitution(U11, U12)         # r x (n-r)
+        NB = -back_substitution(U11, U12)         # r x (n-r)
         N  = Q @ np.vstack([NB, np.eye(n-r)])
     else:
         N  = np.zeros((n,0))
@@ -58,3 +58,14 @@ def rectangular_solver(A,b,tol=1e-12):
     x_part = Q @ z_part
 
     return x_part, N, True, r
+
+def solver(A, b):
+    m, n = A.shape
+    if m == n:
+        return square_solver(A, b)
+    elif m > n:
+        return rectangular_solver(A, b)
+    elif m < n:
+        return rectangular_solver(A, b)
+    else:
+        raise NotImplementedError("solve is a stub; implement parametric solver here.")
