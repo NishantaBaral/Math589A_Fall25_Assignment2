@@ -2,14 +2,27 @@ import numpy as np
 import paqlu_decomposition as paqlu_square
 import paqlu_decomposition_rectangular as paqlu_rectangular
 
+def forward_substitution(L, b):
+    n = L.shape[0]
+    y = np.zeros(n)
+    for i in range(n):
+        y[i] = b[i] - np.dot(L[i, :i], y[:i])
+    return y
+
+def back_substitution(U, y):
+    n = U.shape[0]
+    x = np.zeros(n)
+    for i in range(n-1, -1, -1):
+        x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
+    return x
 def square_solver(A, b):
     P, Q, L, U = paqlu_square.paqlu_decomposition_in_place(A)
     Pb = np.dot(P, b)
-    y = np.linalg.solve(L,Pb)
+    y = forward_substitution(L, Pb)
     print(L)
     print(Pb)
     print(y)
-    x_temp = np.linalg.solve(U,y)
+    x_temp = back_substitution(U, y)
     x = np.dot(Q, x_temp)
     return x
 
@@ -34,9 +47,9 @@ def rectangular_solver(A,b,tol=1e-12):
     y_piv = y[:r]
 
     # Particular and null in z-coordinates
-    zB_part = np.linalg.solve(U11, y_piv)
+    zB_part = forward_substitution(U11, y_piv)
     if n > r:
-        NB = -np.linalg.solve(U11, U12)         # r x (n-r)
+        NB = -forward_substitution(U11, U12)         # r x (n-r)
         N  = Q @ np.vstack([NB, np.eye(n-r)])
     else:
         N  = np.zeros((n,0))
