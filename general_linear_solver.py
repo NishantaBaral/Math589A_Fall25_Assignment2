@@ -19,9 +19,6 @@ def square_solver(A, b):
     P, Q, L, U = paqlu_square.paqlu_decomposition_in_place(A)
     Pb = np.dot(P, b)
     y = forward_substitution(L, Pb)
-    print(L)
-    print(Pb)
-    print(y)
     x_temp = back_substitution(U, y)
     x = np.dot(Q, x_temp)
     return x
