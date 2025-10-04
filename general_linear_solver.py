@@ -59,7 +59,7 @@ def rectangular_solver(A,b,tol=1e-12):
 
     return x_part, N, True, r
 
-def solver(A, b):
+def solve(A, b):
     m, n = A.shape
     if m == n:
         return square_solver(A, b)
