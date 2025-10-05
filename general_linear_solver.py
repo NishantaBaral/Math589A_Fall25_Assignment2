@@ -15,6 +15,7 @@ def back_substitution(U, y):
     for i in range(n-1, -1, -1):
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return x
+    
 def square_solver(A, b):
     P, Q, L, U = paqlu_square.paqlu_decomposition_in_place(A)
     Pb = np.dot(P, b)
@@ -28,7 +29,7 @@ def square_solver(A, b):
 def rectangular_solver(A,b,tol=1e-12):
     P,Q,L,U = paqlu_rectangular.paqlu_decomposition_in_place(A)
     #Forward solve Ly = Pb
-    y = np.linalg.solve(L, np.dot(P,b))
+    y = forward_substitution(L, np.dot(P,b))
 
     #Rank from nonzero rows of U
     nonzero_rows = np.where(np.any(np.abs(U) > tol, axis=1))[0]
@@ -38,7 +39,7 @@ def rectangular_solver(A,b,tol=1e-12):
     if np.linalg.norm(y[r:], ord=np.inf) > 10*tol:
         return None, None, False, r
 
-    # 4) Blocks
+    #Blocks
     n = U.shape[1]
     U_top = U[:r,:]
     U11   = U_top[:,:r]
