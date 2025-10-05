@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def paqlu_decomposition_in_place(A):
+def paqlu_decomposition_in_place(A,tol=1e-12):
     m = A.shape[:][0] #Number of rows
     n = A.shape[:][1] #Number of columns
     U = A.copy() #Starting with U as A
@@ -12,10 +12,9 @@ def paqlu_decomposition_in_place(A):
 
     for k in range (min(m,n)):
         a = U[k:,k:] #Extracting the relevant submatrix
-        print(a)
         pivot = a.flat[np.abs(a).argmax()]  #Finding the pivot element
         r = np.argwhere(a == pivot) #Finding the position of pivot element
-        if pivot == 0:
+        if np.abs(pivot) <= tol:
             break #If pivot is zero, break the loop
         rank += 1 #Incrementing rank
         row_index = r[0][0] + k #Getting the actual row index in U
@@ -39,5 +38,4 @@ def paqlu_decomposition_in_place(A):
     for d in range(rank):
         L[d, d] = 1.0 #Setting the diagonal elements of L to 1
 
-    return P, Q, L, U
-
+    return P, Q,L, U

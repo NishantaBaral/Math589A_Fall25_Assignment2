@@ -66,3 +66,12 @@ def solve(A, b):
         return rectangular_solver(A, b)
     else:
         raise NotImplementedError("solve is a stub; implement parametric solver here.")
+    
+if __name__ == "__main__":
+    A = np.array([[0, 2, 1],
+                  [1, 1, 1],
+                  [2, 1, 0]], dtype=float)
+    b = np.array([1, 2, 3], dtype=float)
+    x = paqlu_square.paqlu_decomposition_in_place(A)
+    
+
