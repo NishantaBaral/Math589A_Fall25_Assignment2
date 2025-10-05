@@ -33,20 +33,13 @@ def rectangular_solve(A,B,tol=1e-12):
 def solve(A,B):
     m,n = A.shape
     if m == n:
-        P,A,L,U = paqlu_square.paqlu_decomposition_in_place(A)
+        P,Q,L,U = paqlu_square.paqlu_decomposition_in_place(A)
         Pb = np.dot(P,B)
         y = forward_substitution(L,Pb)
-        x = back_substitution(U,y)
-        N = np.zeros(A.shape[1])
-        return x,N
+        x_perm = back_substitution(U,y)
+        x = np.dot(Q, x_perm)
+        N = np.zeros((n, 0))  # Empty null space with correct shape
+        return x, N
     else:
-        x,N = rectangular_solve(A,B)
-        return x,N  
-A = np.array([[5,2,1],
-              [10,7,6],
-              [-5,7,13],
-              [0,6,10]], dtype=float)
-B = np.array([1,2,3,4], dtype=float)
-x,N = solve(A,B)
-print("x is", x)
-print("N is", N)
+        x, N = rectangular_solve(A,B)
+        return x, N
