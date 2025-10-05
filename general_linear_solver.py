@@ -16,19 +16,26 @@ def back_substitution(U,y):
         x[i] = (y[i] - np.dot(U[i,i+1:],x[i+1:]))/U[i,i]
     return x
 
-def rectangular_solve(A,B,tol=1e-12):
-    P,Q,L,U = paqlu_rectangular.paqlu_decomposition_in_place(A)
-    y = forward_substitution(L,np.dot(P,B))
+def rectangular_solve(A, B, tol=1e-12):
+    P, Q, L, U = paqlu_rectangular.paqlu_decomposition_in_place(A)
+    m, n = A.shape
     rank = U.shape[0]
-    x_basic = back_substitution(U,y[:rank])
-    n = A.shape[1]
+    Pb = np.dot(P, B)
+    y = forward_substitution(L, Pb[:rank])
+    x_basic = back_substitution(U, y)
     x = np.zeros(n)
-    x[:rank] = x_basic
-    N = np.zeros((n - rank, n))
-    for i in range(n - rank):
-        N[i, rank + i] = 1
-    N = np.dot(Q,N.T).T
-    return np.dot(Q,x),N
+    # Q is a permutation matrix, so Q.T @ [x_basic, 0] puts x_basic in the correct places
+    x_full = np.zeros(n)
+    x_full[:rank] = x_basic
+    x = np.dot(Q.T, x_full)
+    # Null space basis
+    N = np.zeros((n, n - rank))
+    if n > rank:
+        N[rank:, :] = np.eye(n - rank)
+        N = np.dot(Q.T, N)
+    else:
+        N = np.zeros((n, 0))
+    return x, N
 
 def solve(A,B):
     m,n = A.shape
