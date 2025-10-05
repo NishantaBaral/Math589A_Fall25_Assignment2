@@ -21,7 +21,9 @@ def square_solver(A, b):
     y = forward_substitution(L, Pb)
     x_temp = back_substitution(U, y)
     x = np.dot(Q, x_temp)
-    return x
+    N  = np.zeros((A.shape[1], 0))   # no free variables
+    return x, N
+
 
 def rectangular_solver(A,b,tol=1e-12):
     P,Q,L,U = paqlu_rectangular.paqlu_decomposition_in_place(A)
@@ -54,7 +56,7 @@ def rectangular_solver(A,b,tol=1e-12):
     z_part = np.concatenate([zB_part, np.zeros(n-r)])
     x_part = Q @ z_part
 
-    return x_part, N, True, r
+    return x_part, N
 
 def solve(A, b):
     m, n = A.shape
@@ -66,5 +68,4 @@ def solve(A, b):
         return rectangular_solver(A, b)
     else:
         raise NotImplementedError("solve is a stub; implement parametric solver here.")
-    
     
