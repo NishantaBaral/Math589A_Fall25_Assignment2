@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def paqlu_decomposition_in_place(A,tol=1e-12):
+def paqlu_decomposition_in_place(A,tol=1e-6):
     m = A.shape[:][0] #Number of rows
     n = A.shape[:][1] #Number of columns
     U = A.copy() #Starting with U as A
@@ -38,4 +38,4 @@ def paqlu_decomposition_in_place(A,tol=1e-12):
     for d in range(rank):
         L[d, d] = 1.0 #Setting the diagonal elements of L to 1
 
-    return P, Q,L, U
+    return P, Q,L, U,rank
