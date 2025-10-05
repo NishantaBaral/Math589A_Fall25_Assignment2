@@ -37,7 +37,7 @@ def solve(A,B):
         Pb = np.dot(P,B)
         y = forward_substitution(L,Pb)
         x_perm = back_substitution(U,y)
-        x = np.dot(Q, x_perm)
+        x = np.dot(Q.T, x_perm)
         N = np.zeros((n, 0))  # Empty null space with correct shape
         return x, N
     else:
