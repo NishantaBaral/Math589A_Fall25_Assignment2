@@ -40,27 +40,35 @@ def square_solver(A, b):
 def rectangular_solver(A, b):
     m,n = A.shape
     P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
-    b_ = np.dot(P, b)        # permute b according to P
-    y = forward_substitution(L, b_)  # solve Ly = Pb
-    #Take the first 'rank' components of y
-    y_pivot = y[:rank]
-    #partiition the U matrix to pivot and non-pivot columns
-    U_basic = U[:rank, :rank]
-    U_free = U[:rank, rank:]
-    #Compute particular solution
-    x_basic = back_substitution(U_basic, y_pivot)
-    #Construct the full solution vector
-    x = np.zeros(n)
-    x[:rank] = x_basic
-    x = np.dot(Q.T, x)         # unpermute x' according to Q
-    #Compute the nullspace
+    L11 = L[:rank, :rank]
+    U11 = U[:rank, :rank]
+    U12 = U[:rank, rank:]
+    Pb = np.dot(P, b)      # permute b according to P
+    y = forward_substitution(L11, Pb[:rank])  # solve Ly = Pb
+    x_basic = back_substitution(U11, y)  # solve Ux' = y
+    x_perm = np.zeros(n,dtype=float)
+    x_perm[:rank] = x_basic
+
+    x_particular = np.dot(Q.T, x_perm)  # unpermute x' according to Q
+
+    # Nullspace basis (columns). If r < n:
     if rank < n:
-        nullspace = np.zeros((n, n - rank))
-        for i in range(n - rank):
-            nullspace[rank + i, i] = 1
-            for j in range(rank - 1, -1, -1):
-                nullspace[j, i] = -np.dot(U_basic[j, :], nullspace[:rank, i]) / U_basic[j, j]
-        nullspace = np.dot(Q.T, nullspace)  # unpermute nullspace according to Q
+        k = n - rank
+        N_perm = np.zeros((n, k), dtype=A.dtype)
+        # For each free variable e_i in the permuted coordinates:
+        for i in range(k):
+            # Solve U11 * w = -U12[:, i]
+            rhs_ns = -U12[:, i]
+            w = back_substitution(U11, rhs_ns)  # length r
+
+            col = np.zeros(n, dtype=A.dtype)
+            col[:rank] = w           # basic part
+            col[rank + i] = 1        # free var = 1
+            N_perm[:, i] = col
+
+        nullspace = np.dot(Q.T, N_perm)  # unpermute nullspace basis
     else:
-        nullspace = np.zeros((n, 0))  # No nullspace if rank == n
-    return x, nullspace
+        nullspace = np.zeros((n, 0), dtype=A.dtype)
+
+    return x_particular, nullspace
+
