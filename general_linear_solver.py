@@ -50,7 +50,7 @@ def rectangular_solver(A, b):
     x_perm = np.zeros(n,dtype=float)
     x_perm[:rank] = x_basic
 
-    x_particular = np.dot(Q, x_perm)  # unpermute x' according to Q
+    x_particular = Q.T @ x_perm  # unpermute x' according to Q
 
     # Nullspace basis (columns). If r < n:
     if rank < n:
@@ -73,7 +73,7 @@ def rectangular_solver(A, b):
 
     return x_particular, nullspace
 
-def test():
+if __name__ == "__main__":
     A = np.array([[1,3,0,2],[0,0,1,4],[1,3,1,6]],dtype=float)
     b = np.array([1,6,7], dtype=float)
 
@@ -81,6 +81,9 @@ def test():
     print("PAQ is", P @ A @ Q)
     print("LU is", L @ U)
 
-    N, x = solve(A, b)
+    x, N = solve(A, b)
     print("Nullspace is", N)
     print("Particular solution is", x)
+
+    print("Ax is", A @ x)
+    print("b is", b)
