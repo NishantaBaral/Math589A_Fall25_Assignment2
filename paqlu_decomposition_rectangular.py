@@ -12,10 +12,12 @@ def paqlu_decomposition_in_place(A,tol=1e-6):
 
     for k in range (min(m,n)):
         a = U[k:,k:] #Extracting the relevant submatrix
-        pivot = a.flat[np.abs(a).argmax()]  #Finding the pivot element
-        r = np.argwhere(a == pivot) #Finding the position of pivot element
-        if np.abs(pivot) <= tol:
-            break #If pivot is zero, break the loop
+        i_rel, j_rel = np.unravel_index(np.abs(a).argmax(), a.shape) #Finding the index of maximum element in the submatrix
+        row_index = k + i_rel
+        column_index = k + j_rel
+        pivot = U[row_index, column_index]
+        if abs(pivot) <= tol:
+            break #if the pivot is less than tolerance, we stop
         rank += 1 #Incrementing rank
         row_index = r[0][0] + k #Getting the actual row index in U
         column_index= r[0][1] + k #Getting the actual column index in U
@@ -39,3 +41,4 @@ def paqlu_decomposition_in_place(A,tol=1e-6):
         L[d, d] = 1.0 #Setting the diagonal elements of L to 1
 
     return P, Q,L, U,rank
+
