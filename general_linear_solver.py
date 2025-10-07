@@ -37,4 +37,4 @@ def square_solver(A, b):
     x_perm = back_substitution(U, y)  # solve Ux' = y
     x = np.dot(Q, x_perm)         # unpermute x' according to Q
     nullspace = np.zeros((n, 0), dtype=float)
-    return nullspace, x
+    return x, nullspace
