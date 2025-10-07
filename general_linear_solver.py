@@ -105,7 +105,7 @@ def rectangular_solver(A, b,tol=1e-6):
     else:
         nullspace = np.zeros((n, 0), dtype=float)
 
-    return (x_particular, np.zeros(n, dtype=float))
+    return x_particular, np.zeros((n-rank, 0), dtype=float)
 
 def test():
     A = np.array([[1,2],[4,5],[6,7],[8,9]],dtype=float)
