@@ -10,7 +10,7 @@ def solve(A, b):
     if m == n:
         return square_solver(A, b)
     elif m != n:
-        return rectangular_solver(A, b)
+        return False
     else:
         raise ValueError("Matrix A must be either square or rectangular.")
     
@@ -62,7 +62,7 @@ def get_nullspace(U11, U12, Q, n, rank):
         N_perm[:, j] = col
     return Q @ N_perm
 
-def get_x_particualar(P,Q,L11,U11,b,rank,n):
+def get_x_particular(P,Q,L11,U11,b,rank,n):
     Pb = np.dot(P,b)
     if rank == 0:
         return np.zeros(n, dtype=float)
@@ -83,15 +83,15 @@ def rectangular_solver(A, b,tol=1e-6):
     U11 = U[:rank, :rank]
     U12 = U[:rank, rank:]
 
-    x_particular = get_x_particualar(P,Q,L11,U11,b,rank,n)
+    x_particular = get_x_particular(P,Q,L11,U11,b,rank,n)
     nullspace = get_nullspace (U11,U12,Q,n,rank)
 
     return x_particular,nullspace
     
 
 def test():
-    A = np.array([[1,2],[4,5],[6,7],[8,9]],dtype=float)
-    B = np.array([7,8,9,10],dtype=float)
+    A = np.array([[1,3,0,2],[0,0,1,4],[0,0,0,0]],dtype=float)
+    B = np.array([1,6,7],dtype=float)
     x,N = solve(A,B)
     print("x is", x)
     print("nullspace is", N)
