@@ -23,10 +23,7 @@ def back_substitution(U, y):
 
 def linear_system_solver(A, b):
     m,n = A.shape
-    if m==n:
-        P,Q,L,U = paqlu_square.paqlu_decomposition_in_place(A)
-    else:
-        P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
+    P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
     L11 = L[:rank, :rank]
     U11 = U[:rank, :rank]
     U12 = U[:rank, rank:]
