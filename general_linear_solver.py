@@ -76,7 +76,7 @@ def rectangular_solver(A, b,tol=1e-6):
     logger.info(f"x_perm after assigning x_basic: {x_perm}")
     x_perm[rank:] = 0
 
-    x_particular = Q.T @ x_perm  # unpermute x' according to Q
+    x_particular = Q @ x_perm  # unpermute x' according to Q
     logger.info(f"Particular solution x_particular after unpermuting: {x_particular}")
     # Nullspace basis (columns). If r < n:
     if rank < n:
@@ -100,9 +100,8 @@ def rectangular_solver(A, b,tol=1e-6):
             N_perm[:, i] = col
             logger.info(f"N_perm after setting column for free variable {i} is: {N_perm}")
 
-        nullspace_cols = np.dot(Q.T, N_perm)  # unpermute nullspace basis
-        logger.info(f"Nullspace basis after unpermuting (nullspace) is: {nullspace_cols}")   
-        nullspace = nullspace_cols.T      
+        nullspace = np.dot(Q, N_perm)  # unpermute nullspace basis
+        logger.info(f"Nullspace basis after unpermuting (nullspace) is: {nullspace}")   
     else:
         nullspace = np.zeros((n, 0), dtype=float)
     return x_particular, nullspace
