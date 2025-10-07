@@ -44,7 +44,7 @@ def rectangular_solver(A, b):
     L11 = L[:rank, :rank]
     U11 = U[:rank, :rank]
     U12 = U[:rank, rank:]
-    Pb = np.dot(P, b)      # permute b according to P
+    Pb = np.dot(P.T, b)      # permute b according to P
     y = forward_substitution(L11, Pb[:rank])  # solve Ly = Pb
     x_basic = back_substitution(U11, y)  # solve Ux' = y
     x_perm = np.zeros(n,dtype=float)
