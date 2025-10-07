@@ -26,7 +26,7 @@ def forward_substitution(L, b):
 
 def back_substitution(U, y):
     n = U.shape[0]
-    x = np.zeros(n)
+    x = np.zeros(n,dtype=float)
     for i in range(n-1, -1, -1):
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return x
@@ -74,11 +74,11 @@ def rectangular_solver(A, b,tol=1e-6):
     logger.info(f"Basic solution x_basic after back substitution is: {x_basic}")
     x_perm = np.zeros(n,dtype=float)
     logger.info(f"Initialized x_perm with zeros: {x_perm}")
-    x_perm[:rank] = x_basic.flatten()
+    x_perm[:rank] = x_basic
     logger.info(f"x_perm after assigning x_basic: {x_perm}")
     x_perm[rank:] = 0
 
-    x_particular = Q @ x_perm  # unpermute x' according to Q
+    x_particular = Q.T @ x_perm  # unpermute x' according to Q
     logger.info(f"Particular solution x_particular after unpermuting: {x_particular}")
     # Nullspace basis (columns). If r < n:
     if rank < n:
@@ -102,7 +102,7 @@ def rectangular_solver(A, b,tol=1e-6):
             N_perm[:, i] = col
             logger.info(f"N_perm after setting column for free variable {i} is: {N_perm}")
 
-        nullspace = np.dot(Q, N_perm)  # unpermute nullspace basis
+        nullspace = np.dot(Q.T, N_perm)  # unpermute nullspace basis
         logger.info(f"Nullspace basis after unpermuting (nullspace) is: {nullspace}")   
     else:
         nullspace = np.zeros((n, 0), dtype=float)
