@@ -10,7 +10,7 @@ def solve(A, b):
     if m == n:
         return square_solver(A, b)
     elif m != n:
-        return False
+        return rectangular_solver(A,b)
     else:
         raise ValueError("Matrix A must be either square or rectangular.")
     
