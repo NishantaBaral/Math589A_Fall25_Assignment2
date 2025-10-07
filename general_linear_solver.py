@@ -104,7 +104,8 @@ def rectangular_solver(A, b,tol=1e-6):
         logger.info(f"Nullspace basis after unpermuting (nullspace) is: {nullspace}")   
     else:
         nullspace = np.zeros((n, 0), dtype=float)
-    return x_particular
+
+    return (x_particular, np.zeros((n, 0), dtype=float))
 
 def test():
     A = np.array([[1,2],[4,5],[6,7],[8,9]],dtype=float)
@@ -114,4 +115,8 @@ def test():
     logger.info(f"Nullspace N is: {N}")
 
 if __name__ == "__main__":
-    test()
+    A = np.array([[1, 1,1,1], [-1,-1,1,1]], dtype=float)
+    b = np.array([7, 8], dtype=float)
+    x,N = solve(A, b)
+    print("Particular solution x:", x)
+    print("Nullspace N is:", N)
