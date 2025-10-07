@@ -10,7 +10,7 @@ import numpy as np
 # (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL). Messages below this
 # level will be ignored.
 import logging
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(filename='app.log',level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 # logging.basicConfig(level=logging.INFO,
