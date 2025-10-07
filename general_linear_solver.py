@@ -1,24 +1,30 @@
 import numpy as np
-import paqlu_decomposition_rectangular as paqlu_rectangular
+import test_paqlu_decomposition_rectangular as paqlu_rectangular
 import paqlu_decomposition_square as paqlu_square
 from logging_setup import logger
 
 def solve(A, b):
     return linear_system_solver(A, b)
     
-def forward_substitution(L, b):
+def forward_substitution(L, b,tol=1e-6):
     m = L.shape[0]
     y = np.zeros(m)
     for i in range(m):
         y[i] = b[i] - np.dot(L[i, :i], y[:i])
-        y[i] /= L[i, i]
+        if np.abs(L[i, i]) > tol:
+            y[i] /= L[i, i]
+        else:
+            logger.warning(f"Diagonal element L[{i},{i}] is too small ({L[i,i]}), skipping division to avoid instability.")
     return y
 
-def back_substitution(U, y):
+def back_substitution(U, y,tol=1e-6):
     n = U.shape[0]
     x = np.zeros(n)
     for i in range(n-1, -1, -1):
-        x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
+        if np.abs(U[i, i]) > tol:
+            x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
+        else:
+            logger.warning(f"Diagonal element U[{i},{i}] is too small ({U[i,i]}), skipping division to avoid instability.")
     return x
 
 def linear_system_solver(A, b):
