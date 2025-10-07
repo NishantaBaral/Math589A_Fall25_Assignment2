@@ -66,8 +66,6 @@ def rectangular_solver(A, b,tol=1e-6):
     logger.info(f"U12 is: {U12}")   
     Pb = np.dot(P, b)      # permute b according to P
     logger.info(f"Permuted b (Pb) is: {Pb}")
-    if rank < m and np.any(np.abs(Pb[rank:]) > tol):
-        raise ValueError("Inconsistent system: no solution exists")
     y = forward_substitution(L11, Pb[:rank])  # solve Ly = Pb
     logger.info(f"Intermediate solution y after forward substitution is: {y}")
     x_basic = back_substitution(U11, y)  # solve Ux' = y
