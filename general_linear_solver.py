@@ -100,8 +100,9 @@ def rectangular_solver(A, b,tol=1e-6):
             N_perm[:, i] = col
             logger.info(f"N_perm after setting column for free variable {i} is: {N_perm}")
 
-        nullspace = np.dot(Q.T, N_perm)  # unpermute nullspace basis
-        logger.info(f"Nullspace basis after unpermuting (nullspace) is: {nullspace}")   
+        nullspace_cols = np.dot(Q.T, N_perm)  # unpermute nullspace basis
+        logger.info(f"Nullspace basis after unpermuting (nullspace) is: {nullspace_cols}")   
+        nullspace = nullspace_cols.T      
     else:
         nullspace = np.zeros((n, 0), dtype=float)
     return x_particular, nullspace
@@ -114,10 +115,4 @@ def test():
     logger.info(f"Nullspace N is: {N}")
 
 if __name__ == "__main__":
-    A = np.array([[1, 2], [3, 4], [5, 6]], dtype=float)
-    b = np.array([7, 8, 9], dtype=float)
-    x, N = solve(A, b)
-    print("Particular solution x:", x)
-    print("Nullspace basis N:", N)
-    print("Check Ax ≈ b:", np.allclose(A @ x, b))
-    print("Check A @ N ≈ 0:", np.allclose(A @ N, 0))
+    test()
