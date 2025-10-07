@@ -52,6 +52,12 @@ def rectangular_solver(A, b):
     logger.info(f"L is: {L}")
     logger.info(f"U is: {U}")
     logger.info(f"Decomposition complete. Rank: {rank}")
+    #handle edge cases
+    if rank == 0:
+        x_particular = np.zeros(n, dtype=float)
+        nullspace = Q @ np.eye(n)   # all free
+        return x_particular, nullspace
+    
     L11 = L[:rank, :rank]
     logger.info(f"L11 is: {L11}")
     U11 = U[:rank, :rank]
@@ -98,21 +104,6 @@ def rectangular_solver(A, b):
         logger.info(f"Nullspace basis after unpermuting (nullspace) is: {nullspace}")   
     else:
         nullspace = np.zeros((n, 0), dtype=float)
-    # Diagnostics (temporarily add inside rectangular_solver before return)
-    Ax = A @ x_particular
-    res = Ax - b
-    logger.info(f"||A x_particular - b||_inf = {np.linalg.norm(res, np.inf)}")
-
-    # Check PAQ = LU identity (restricted to rank rows)
-    PAQ = (P @ A) @ Q
-    LU  = L @ U
-    logger.info(f"||PAQ - LU||_inf = {np.linalg.norm(PAQ - LU, np.inf)}")
-
-    # Verify the block equations used to build nullspace
-    if rank < n:
-        # pick the first nullspace vector to validate
-        v = nullspace[:, 0]
-        logger.info(f"||A v||_inf (should be ~0) = {np.linalg.norm(A @ v, np.inf)}")
     return x_particular, nullspace
 
 def test():

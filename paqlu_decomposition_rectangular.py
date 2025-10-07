@@ -5,8 +5,8 @@ def paqlu_decomposition_in_place(A,tol=1e-6):
     m = A.shape[:][0] #Number of rows
     n = A.shape[:][1] #Number of columns
     U = A.copy() #Starting with U as A
-    P = np.identity(m) #Starting with P as identity matrix of size m
-    Q = np.identity(n) #Starting with Q as identity matrix of size n
+    P = np.eye(m) #Starting with P as identity matrix of size m
+    Q = np.eye(n) #Starting with Q as identity matrix of size n
     M = np.zeros((m,n)) #Starting with M as zero matrix of size m x n
     rank = 0 #Starting rank as 0
 
@@ -29,8 +29,7 @@ def paqlu_decomposition_in_place(A,tol=1e-6):
         for i in range(k+1,m):
             multiplier = (U[i][k])/(U[k][k]) #Finding the multiplier
             M[i][k] = multiplier
-            for j in range(k,n):
-                U[i][j] = U[i][j] - (multiplier*U[k][j]) #Updating the U matrix, Gauss elimination step
+            U[i, k:] -= multiplier * U[k, k:]
 
     L = np.zeros((m,rank)) #Initializing L as zero matrix of size m x rank
     L = np.tril(M[:, :rank], 0) #Extracting the lower triangular part of M upto rank
