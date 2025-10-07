@@ -26,7 +26,7 @@ def forward_substitution(L, b):
 
 def back_substitution(U, y):
     n = U.shape[0]
-    x = np.zeros(n)
+    x = np.zeros((n, 1))
     for i in range(n-1, -1, -1):
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return x
@@ -42,7 +42,7 @@ def square_solver(A, b):
     return nullspace, x
 
 
-def rectangular_solver(A, b):
+def rectangular_solver(A, b,tol=1e-6):
     m,n = A.shape
     logger.info(f"Solving system with matrix A of shape {A.shape} and vector b of shape {b.shape}")
     P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
@@ -66,13 +66,15 @@ def rectangular_solver(A, b):
     logger.info(f"U12 is: {U12}")   
     Pb = np.dot(P, b)      # permute b according to P
     logger.info(f"Permuted b (Pb) is: {Pb}")
+    if rank < m and np.any(np.abs(Pb[rank:]) > tol):
+        raise ValueError("Inconsistent system: no solution exists")
     y = forward_substitution(L11, Pb[:rank])  # solve Ly = Pb
     logger.info(f"Intermediate solution y after forward substitution is: {y}")
     x_basic = back_substitution(U11, y)  # solve Ux' = y
     logger.info(f"Basic solution x_basic after back substitution is: {x_basic}")
     x_perm = np.zeros(n,dtype=float)
     logger.info(f"Initialized x_perm with zeros: {x_perm}")
-    x_perm[:rank] = x_basic
+    x_perm[:rank] = x_basic.flatten()
     logger.info(f"x_perm after assigning x_basic: {x_perm}")
     x_perm[rank:] = 0
 
@@ -107,11 +109,17 @@ def rectangular_solver(A, b):
     return x_particular, nullspace
 
 def test():
-    A = np.array([[1,2,2],[2,4,8],[3,6,10],[0,0,0]],dtype=float)
-    B = np.array([1,5,6,2],dtype=float)
+    A = np.array([[1,2],[4,5],[6,7],[8,9]],dtype=float)
+    B = np.array([7,8,9,10],dtype=float)
     x,N = solve(A,B)
     logger.info(f"Solution x is: {x}")
     logger.info(f"Nullspace N is: {N}")
 
 if __name__ == "__main__":
-    test()
+    A = np.array([[1, 2], [3, 4], [5, 6]], dtype=float)
+    b = np.array([7, 8, 9], dtype=float)
+    x, N = solve(A, b)
+    print("Particular solution x:", x)
+    print("Nullspace basis N:", N)
+    print("Check Ax ≈ b:", np.allclose(A @ x, b))
+    print("Check A @ N ≈ 0:", np.allclose(A @ N, 0))
