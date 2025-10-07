@@ -26,7 +26,7 @@ def forward_substitution(L, b):
 
 def back_substitution(U, y):
     n = U.shape[0]
-    x = np.zeros((n, 1))
+    x = np.zeros(n)
     for i in range(n-1, -1, -1):
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return x
