@@ -2,6 +2,7 @@ import numpy as np
 import paqlu_decomposition_rectangular as paqlu_rectangular
 import paqlu_decomposition_square as paqlu_square
 
+
 def solve(A, b):
     m,n = A.shape
     if m == n:
@@ -50,7 +51,7 @@ def rectangular_solver(A, b):
     x_perm = np.zeros(n,dtype=float)
     x_perm[:rank] = x_basic
 
-    x_particular = Q.T @ x_perm  # unpermute x' according to Q
+    x_particular = Q @ x_perm  # unpermute x' according to Q
 
     # Nullspace basis (columns). If r < n:
     if rank < n:
@@ -71,19 +72,4 @@ def rectangular_solver(A, b):
     else:
         nullspace = np.zeros((n, 0), dtype=float)
 
-    return x_particular, nullspace
-
-if __name__ == "__main__":
-    A = np.array([[1,3,0,2],[0,0,1,4],[1,3,1,6]],dtype=float)
-    b = np.array([1,6,7], dtype=float)
-
-    P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
-    print("PAQ is", P @ A @ Q)
-    print("LU is", L @ U)
-
-    x, N = solve(A, b)
-    print("Nullspace is", N)
-    print("Particular solution is", x)
-
-    print("Ax is", A @ x)
-    print("b is", b)
+    return nullspace, x_particular
