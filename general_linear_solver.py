@@ -34,7 +34,7 @@ def square_solver(A, b):
     y = forward_substitution(L, b_perm)  # solve Ly = Pb
     x_perm = back_substitution(U, y)  # solve Ux' = y
     x = np.dot(Q, x_perm)         # unpermute x' according to Q
-    nullspace = np.zeros(n)
+    nullspace = np.zeros((n, 0), dtype=float)
     return x, nullspace
 
 def rectangular_solver(A, b):
@@ -54,21 +54,21 @@ def rectangular_solver(A, b):
     # Nullspace basis (columns). If r < n:
     if rank < n:
         k = n - rank
-        N_perm = np.zeros((n, k), dtype=A.dtype)
+        N_perm = np.zeros((n, k), dtype=float)
         # For each free variable e_i in the permuted coordinates:
         for i in range(k):
             # Solve U11 * w = -U12[:, i]
             rhs_ns = -U12[:, i]
             w = back_substitution(U11, rhs_ns)  # length r
 
-            col = np.zeros(n, dtype=A.dtype)
+            col = np.zeros(n, dtype=float)
             col[:rank] = w           # basic part
             col[rank + i] = 1        # free var = 1
             N_perm[:, i] = col
 
         nullspace = np.dot(Q, N_perm)  # unpermute nullspace basis
     else:
-        nullspace = np.zeros((n, 0), dtype=A.dtype)
+        nullspace = np.zeros((n, 0), dtype=float)
 
     return x_particular, nullspace
 
