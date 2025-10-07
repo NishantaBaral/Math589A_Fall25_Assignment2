@@ -71,4 +71,16 @@ def rectangular_solver(A, b):
     else:
         nullspace = np.zeros((n, 0), dtype=float)
 
-    return nullspace, x_particular
+    return x_particular, nullspace
+
+def test():
+    A = np.array([[1,3,0,2],[0,0,1,4],[1,3,1,6]],dtype=float)
+    b = np.array([1,6,7], dtype=float)
+
+    P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
+    print("PAQ is", P @ A @ Q)
+    print("LU is", L @ U)
+
+    N, x = solve(A, b)
+    print("Nullspace is", N)
+    print("Particular solution is", x)
