@@ -19,8 +19,6 @@ def paqlu_decomposition_in_place(A,tol=1e-6):
         if abs(pivot) <= tol:
             break #if the pivot is less than tolerance, we stop
         rank += 1 #Incrementing rank
-        row_index = r[0][0] + k #Getting the actual row index in U
-        column_index= r[0][1] + k #Getting the actual column index in U
         P[[k,row_index],:] = P[[row_index,k],:] #Swapping the pivot rows of P with k
         Q[:,[k,column_index]] = Q[:,[column_index,k]] #Swapping the pivot columns of Q with k
 
