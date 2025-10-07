@@ -76,7 +76,7 @@ def rectangular_solver(A, b,tol=1e-6):
     logger.info(f"x_perm after assigning x_basic: {x_perm}")
     x_perm[rank:] = 0
 
-    x_particular = Q @ x_perm  # unpermute x' according to Q
+    x_particular = x_perm  # unpermute x' according to Q
     logger.info(f"Particular solution x_particular after unpermuting: {x_particular}")
     # Nullspace basis (columns). If r < n:
     if rank < n:
