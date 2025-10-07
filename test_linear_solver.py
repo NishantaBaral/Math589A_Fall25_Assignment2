@@ -4,8 +4,16 @@ import paqlu_decomposition_square as paqlu_square
 
 
 def solve(A, b):
-    return linear_system_solver(A, b)
+    m,n = A.shape
+    if m == n:
+        return square_solver(A, b)
+    elif m != n:
+        return rectangular_solver(A, b)
+    else:
+        raise ValueError("Matrix A must be either square or rectangular.")
     
+
+
 def forward_substitution(L, b):
     m = L.shape[0]
     y = np.zeros(m)
@@ -21,12 +29,19 @@ def back_substitution(U, y):
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return x
 
-def linear_system_solver(A, b):
+def square_solver(A, b):
     m,n = A.shape
-    if m==n:
-        P,Q,L,U = paqlu_square.paqlu_decomposition_in_place(A)
-    else:
-        P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
+    P, Q, L, U = paqlu_square.paqlu_decomposition_in_place(A)
+    b_perm = np.dot(P, b)        # permute b according to P
+    y = forward_substitution(L, b_perm)  # solve Ly = Pb
+    x_perm = back_substitution(U, y)  # solve Ux' = y
+    x = np.dot(Q, x_perm)         # unpermute x' according to Q
+    nullspace = np.zeros((n, 0), dtype=float)
+    return nullspace, x
+
+def rectangular_solver(A, b):
+    m,n = A.shape
+    P, Q, L, U, rank = paqlu_rectangular.paqlu_decomposition_in_place(A)
     L11 = L[:rank, :rank]
     U11 = U[:rank, :rank]
     U12 = U[:rank, rank:]
@@ -57,4 +72,4 @@ def linear_system_solver(A, b):
     else:
         nullspace = np.zeros((n, 0), dtype=float)
 
-    return x_particular, nullspace
+    return nullspace, x_particular
