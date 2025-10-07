@@ -36,7 +36,7 @@ def square_solver(A, b):
     x_perm = back_substitution(U, y)  # solve Ux' = y
     x = np.dot(Q, x_perm)         # unpermute x' according to Q
     nullspace = np.zeros((n, 0), dtype=float)
-    return x, nullspace
+    return nullspace, x
 
 def rectangular_solver(A, b):
     m,n = A.shape
@@ -71,4 +71,4 @@ def rectangular_solver(A, b):
     else:
         nullspace = np.zeros((n, 0), dtype=float)
 
-    return x_particular, nullspace
+    return nullspace, x_particular
