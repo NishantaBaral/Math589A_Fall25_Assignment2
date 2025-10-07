@@ -71,4 +71,4 @@ def rectangular_solver(A, b):
     else:
         nullspace = np.zeros((n, 0), dtype=float)
 
-    return nullspace, x_particular
+    return x_particular, nullspace
