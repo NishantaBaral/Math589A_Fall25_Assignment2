@@ -7,9 +7,7 @@ from logging_setup import logger
 
 def solve(A, b):
     m,n = A.shape
-    if m == n:
-        return square_solver(A, b)
-    elif m != n:
+    if m == n or m!=n:
         return rectangular_solver(A,b)
     else:
         raise ValueError("Matrix A must be either square or rectangular.")
@@ -31,15 +29,6 @@ def back_substitution(U, y):
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return x
 
-def square_solver(A, b):
-    m,n = A.shape
-    P, Q, L, U = paqlu_square.paqlu_decomposition_in_place(A)
-    b_perm = np.dot(P, b)        # permute b according to P
-    y = forward_substitution(L, b_perm)  # solve Ly = Pb
-    x_perm = back_substitution(U, y)  # solve Ux' = y
-    x = np.dot(Q, x_perm)         # unpermute x' according to Q
-    nullspace = np.zeros((n, 0), dtype=float)
-    return nullspace, x
 
 def get_nullspace(U11, U12, Q, n, rank):
     if rank >= n:
@@ -62,11 +51,18 @@ def get_nullspace(U11, U12, Q, n, rank):
         N_perm[:, j] = col
     return Q @ N_perm
 
-def get_x_particular(P,Q,L11,U11,b,rank,n):
+def get_x_particular(P,Q,L,L11,U11,b,rank,n):
     Pb = np.dot(P,b)
     if rank == 0:
+        if np.linalg.norm(Pb, np.inf) > 1e-6:
+            return None            # <-- THIS is the missing piece
         return np.zeros(n, dtype=float)
     y = forward_substitution(L11, Pb[:rank])  # solve Ly = Pb
+     # --- consistency check for extra rows ---
+    if L is not None and L.shape[0] > rank:
+        L21 = L[rank:, :rank]
+        if L21.size and not np.allclose(L21 @ y, Pb[rank:], atol=10*1e-6):
+            return None  # inconsistent: no particular
     x_basic = back_substitution(U11, y)  # solve Ux' = y
     x_perm = np.zeros(n,dtype=float)
     x_perm[:rank] = x_basic
@@ -83,7 +79,7 @@ def rectangular_solver(A, b,tol=1e-6):
     U11 = U[:rank, :rank]
     U12 = U[:rank, rank:]
 
-    x_particular = get_x_particular(P,Q,L11,U11,b,rank,n)
+    x_particular = get_x_particular(P,Q,L,L11,U11,b,rank,n)
     nullspace = get_nullspace (U11,U12,Q,n,rank)
 
     return x_particular,nullspace
@@ -96,5 +92,14 @@ def test():
     print("x is", x)
     print("nullspace is", N)
 
-if __name__ == "__main__":
-    test()
+def test_full_rank_square():
+    A = np.array([[2, 1], [1, 3]], dtype=float)
+    b = np.array([3, 5], dtype=float)
+    x, N = solve(A, b)
+    assert np.allclose(A @ x, b)
+
+def test_rank_deficient():
+    A = np.array([[1, 4,2,0], [0,2, 4,0],[0,0,2,0]], dtype=float)
+    b = np.array([3,0,6], dtype=float)
+    x,N = solve(A, b)
+
