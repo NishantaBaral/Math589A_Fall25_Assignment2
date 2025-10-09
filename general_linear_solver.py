@@ -4,11 +4,7 @@ import paqlu_decomposition_square as paqlu_square
 from logging_setup import logger
 
 def solve(A, b):
-    m,n = A.shape
-    if m == n or m!=n:
-        return rectangular_solver(A,b)
-    else:
-        raise ValueError("Matrix A must be either square or rectangular.")
+   return rectangular_solver(A, b)
     
 def forward_substitution(L, b):
     m = L.shape[1]
@@ -57,13 +53,16 @@ def get_x_particular(P,Q,L,L11,U11,b,rank,n):
      # --- consistency check for extra rows ---
     if L is not None and L.shape[0] > rank:
         L21 = L[rank:, :rank]
-        if L21.size and not np.allclose(L21 @ y, Pb[rank:], atol=10*1e-6):
+        if L21.size and not np.allclose(L21 @ y, Pb[rank:], atol=1e-6, rtol=0):
             return None  # inconsistent: no particular
     x_basic = back_substitution(U11, y)  # solve Ux' = y
     x_perm = np.zeros(n,dtype=float)
     x_perm[:rank] = x_basic
     x_perm[rank:] = 0
     x_particular = Q @ x_perm  # unpermute x' according to Q
+    
+    if x_particular is not None and x_particular.ndim == 1:
+        x_particular = x_particular.reshape(-1, 1)
 
     return x_particular
 
