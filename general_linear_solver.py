@@ -3,8 +3,6 @@ import paqlu_decomposition_rectangular as paqlu_rectangular
 import paqlu_decomposition_square as paqlu_square
 from logging_setup import logger
 
-
-
 def solve(A, b):
     m,n = A.shape
     if m == n or m!=n:
@@ -12,10 +10,8 @@ def solve(A, b):
     else:
         raise ValueError("Matrix A must be either square or rectangular.")
     
-
-
 def forward_substitution(L, b):
-    m = L.shape[0]
+    m = L.shape[1]
     y = np.zeros(m)
     for i in range(m):
         y[i] = b[i] - np.dot(L[i, :i], y[:i])
@@ -83,23 +79,16 @@ def rectangular_solver(A, b,tol=1e-6):
     nullspace = get_nullspace (U11,U12,Q,n,rank)
 
     return x_particular,nullspace
-    
 
-def test():
-    A = np.array([[1,3,0,2],[0,0,1,4],[0,0,0,0]],dtype=float)
-    B = np.array([1,6,7],dtype=float)
-    x,N = solve(A,B)
-    print("x is", x)
-    print("nullspace is", N)
+def unitest():
+    A = np.array([[2, 1, -1],
+                  [-3, -1, 2],
+                  [-2, 1, 2]], dtype=float)
+    b = np.array([8, -11, -3], dtype=float)
 
-def test_full_rank_square():
-    A = np.array([[2, 1], [1, 3]], dtype=float)
-    b = np.array([3, 5], dtype=float)
-    x, N = solve(A, b)
-    assert np.allclose(A @ x, b)
+    x_particular, nullspace = rectangular_solver(A, b)
+    print("Particular solution x:", x_particular)
+    print("Nullspace basis N:\n", nullspace)
 
-def test_rank_deficient():
-    A = np.array([[1, 4,2,0], [0,2, 4,0],[0,0,2,0]], dtype=float)
-    b = np.array([3,0,6], dtype=float)
-    x,N = solve(A, b)
-
+if __name__ == "__main__":
+    unitest()

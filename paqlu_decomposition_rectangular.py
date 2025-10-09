@@ -2,8 +2,8 @@ import numpy as np
 import math
 
 def paqlu_decomposition_in_place(A,tol=1e-6):
-    m = A.shape[:][0] #Number of rows
-    n = A.shape[:][1] #Number of columns
+    m = A.shape[0] #Number of rows
+    n = A.shape[1] #Number of columns
     U = A.copy() #Starting with U as A
     P = np.eye(m) #Starting with P as identity matrix of size m
     Q = np.eye(n) #Starting with Q as identity matrix of size n
