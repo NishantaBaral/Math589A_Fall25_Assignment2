@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import paqlu_decomposition_rectangular as paqlu_rectangular
 import paqlu_decomposition_square as paqlu_square
@@ -43,10 +41,13 @@ def get_nullspace(U11, U12, Q, n, rank):
         col[:rank] = w
         col[rank + j] = 1.0
         N_perm[:, j] = col
-    return Q @ N_perm
+        Q_arr = np.asarray(Q)
+    return N_perm[Q_arr, :] if Q_arr.ndim == 1 else Q_arr @ N_perm
 
 def get_x_particular(P,Q,L,L11,U11,b,rank,n):
-    Pb = np.dot(P,b)
+    b = np.asarray(b, dtype=float).reshape(-1)      # ensure 1-D
+    P_arr = np.asarray(P)
+    Pb = b[P_arr] if P_arr.ndim == 1 else P_arr @ b
     if rank == 0:
         if np.linalg.norm(Pb, np.inf) > 1e-6:
             return None            # <-- THIS is the missing piece
@@ -61,8 +62,13 @@ def get_x_particular(P,Q,L,L11,U11,b,rank,n):
     x_perm = np.zeros(n,dtype=float)
     x_perm[:rank] = x_basic
     x_perm[rank:] = 0
-    x_particular = Q @ x_perm  # unpermute x' according to Q
-    
+    Q_arr = np.asarray(Q)
+    if Q_arr.ndim == 1:
+        x_particular = np.zeros_like(x_perm)
+        x_particular[Q_arr] = x_perm
+    else:
+        x_particular = Q_arr @ x_perm
+
     if x_particular is not None and x_particular.ndim == 1:
         x_particular = x_particular.reshape(-1, 1)
 
